@@ -1,0 +1,41 @@
+[build]
+  publish = "frontend"
+  command = "echo 'Frontend deployment - no build required'"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF"
+
+[build.environment]
+  # No Python needed for frontend
+  SKIP_PYTHON = "true"
+
+# Force static site deployment
+[build.processing]
+  skip_processing = false
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Prevent Python detection
+[[headers]]
+  for = "*.py"
+  [headers.values]
+    X-Robots-Tag = "noindex"
